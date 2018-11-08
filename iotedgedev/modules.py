@@ -209,7 +209,14 @@ class Modules:
                     docker.process_api_response(response)
             self.output.footer("BUILD COMPLETE", suppress=no_build)
             self.output.footer("PUSH COMPLETE", suppress=no_push)
-        self.utility.set_config(force=True, replacements=replacements)
+
+        deployment_manifest.convert_create_options()
+
+        self.utility.ensure_dir(self.envvars.CONFIG_OUTPUT_DIR)
+        gen_deployment_manifest_path = os.path.join(self.envvars.CONFIG_OUTPUT_DIR, "deployment.json")
+
+        self.output.info("Expanding '{0}' to '{1}'".format(os.path.basename(self.envvars.DEPLOYMENT_CONFIG_TEMPLATE_FILE), gen_deployment_manifest_path))
+        deployment_manifest.dump(gen_deployment_manifest_path)
 
     def _update_launch_json(self, name, template, group_id):
         new_launch_json = self._get_launch_json(name, template, group_id)
